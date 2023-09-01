@@ -11,6 +11,10 @@
     {
       "path": "pages/index/index",
       "style": {
+        // 隐藏导航
+        "navigationStyle": "custom",
+        // 标题颜色
+        "navigationBarTextStyle": "white",
         "navigationBarTitleText": "首页"
       }
     },
