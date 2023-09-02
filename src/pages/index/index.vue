@@ -8,7 +8,8 @@ import { BannerItem, CatrgoryPanelItem, HotPanelItem } from '@/types/home.d'
 import CategoryPanel from '@/pages/index/components/CategoryPanel.vue'
 import HotPanel from '@/pages/index/components/HotPanel.vue'
 import { RainGuessInstance } from '@/components/components.d'
-
+import PageSkeleton from './components/PageSkeleton.vue'
+const isLoading = ref(false)
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CatrgoryPanelItem[]>([])
 const hotPanelList = ref<HotPanelItem[]>([])
@@ -29,10 +30,10 @@ const onscrolltolower = () => {
     guessRef.value?.getMore()
 }
 const guessRef = ref<RainGuessInstance>()
-onLoad(() => {
-    getHomeBannerData()
-    getHomeCategoryData()
-    getHomeHostPanelData()
+onLoad(async () => {
+    isLoading.value = true
+    await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHostPanelData()])
+    isLoading.value = false
 })
 const isTriggered = ref(false)
 
@@ -58,10 +59,13 @@ const onrefresherrefresh = async () => {
         @refresherrefresh="onrefresherrefresh"
         :refresher-triggered="isTriggered"
     >
-        <RainSwiper :list="bannerList"></RainSwiper>
-        <CategoryPanel :categoryList="categoryList"></CategoryPanel>
-        <HotPanel :list="hotPanelList"></HotPanel>
-        <RainGuess ref="guessRef"></RainGuess>
+        <PageSkeleton v-if="isLoading"></PageSkeleton>
+        <template v-else>
+            <RainSwiper :list="bannerList"></RainSwiper>
+            <CategoryPanel :categoryList="categoryList"></CategoryPanel>
+            <HotPanel :list="hotPanelList"></HotPanel>
+            <RainGuess ref="guessRef"></RainGuess>
+        </template>
     </scroll-view>
 </template>
 
