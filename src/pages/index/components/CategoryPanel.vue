@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CatrgoryPanelItem } from '@/types/home.d.ts'
+import { CatrgoryPanelItem } from '@/types/home.d'
 
 const props = defineProps<{
     categoryList: CatrgoryPanelItem[]
