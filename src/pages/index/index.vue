@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import CustomNavbar from '@/components/CustomNavbar.vue'
-//
+import RainSwiper from '@/components/RainSwiper.vue'
+import CustomNavbar from '@/pages/index/components/CustomNavbar'
 </script>
 
 <template>
     <CustomNavbar></CustomNavbar>
+    <RainSwiper></RainSwiper>
 </template>
 
 <style lang="scss">
