@@ -1,50 +1,36 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { BannerItem } from '@/types/home.d.ts'
+import { ref, onMounted } from 'vue'
 
 const activeIndex = ref(0)
 // swiper 切换时触发
 const onChange: UniHelper.SwiperOnChange = (e) => {
-    console.log(e.detail.current)
     activeIndex.value = e.detail!.current
 }
+const props = defineProps<{
+    list: BannerItem[]
+}>()
+onMounted(() => {
+    setTimeout(() => {
+        console.log('轮播图数据来了', props.list)
+    }, 1000)
+})
 </script>
 
 <template>
     <view class="carousel">
         <swiper :circular="true" :autoplay="false" :interval="3000" @change="onChange">
-            <swiper-item>
+            <swiper-item v-for="item in list" :key="item.id">
                 <navigator url="/pages/index/index" hover-class="none" class="navigator">
-                    <image
-                        mode="aspectFill"
-                        class="image"
-                        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/slider_1.jpg"
-                    ></image>
-                </navigator>
-            </swiper-item>
-            <swiper-item>
-                <navigator url="/pages/index/index" hover-class="none" class="navigator">
-                    <image
-                        mode="aspectFill"
-                        class="image"
-                        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/slider_2.jpg"
-                    ></image>
-                </navigator>
-            </swiper-item>
-            <swiper-item>
-                <navigator url="/pages/index/index" hover-class="none" class="navigator">
-                    <image
-                        mode="aspectFill"
-                        class="image"
-                        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/slider_3.jpg"
-                    ></image>
+                    <image mode="aspectFill" class="image" :src="item.imgUrl"></image>
                 </navigator>
             </swiper-item>
         </swiper>
         <!-- 指示点 -->
         <view class="indicator">
             <text
-                v-for="(item, index) in 3"
-                :key="item"
+                v-for="(item, index) in list.length"
+                :key="item.id"
                 class="dot"
                 :class="{ active: index === activeIndex }"
             ></text>

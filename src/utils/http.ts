@@ -5,7 +5,6 @@ const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
 const httpInterceptor: UniApp.InterceptorOptions = {
     invoke(options: UniApp.RequestOptions) {
         // log
-        console.log(options)
 
         if (!options.url.startsWith('http')) {
             options.url = baseURL + options.url
@@ -20,7 +19,6 @@ const httpInterceptor: UniApp.InterceptorOptions = {
         if (token) {
             options.header.Authorization = token
         }
-        console.log(options)
     },
 }
 
