@@ -34,11 +34,28 @@ onLoad(() => {
     getHomeCategoryData()
     getHomeHostPanelData()
 })
+const isTriggered = ref(false)
+
+const onrefresherrefresh = async () => {
+    // 开始动画
+    isTriggered.value = true
+    console.log('下拉刷新触发')
+
+    await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHostPanelData()])
+    isTriggered.value = false
+}
 </script>
 
 <template>
     <CustomNavbar></CustomNavbar>
-    <scroll-view scroll-y class="scroll-view" @scrolltolower="onscrolltolower">
+    <scroll-view
+        scroll-y
+        class="scroll-view"
+        @scrolltolower="onscrolltolower"
+        refresher-enabled
+        @refresherrefresh="onrefresherrefresh"
+        :refresher-triggered="isTriggered"
+    >
         <RainSwiper :list="bannerList"></RainSwiper>
         <CategoryPanel :categoryList="categoryList"></CategoryPanel>
         <HotPanel :list="hotPanelList"></HotPanel>
