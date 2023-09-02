@@ -1,4 +1,4 @@
-import { BannerItem } from '@/types/home.d.ts'
+import { BannerItem, CatrgoryPanelItem } from '@/types/home.d.ts'
 import { http } from '@/utils/http'
 // 首页广告区域
 export const getHomeBannerAPI = (distributionSite = 1) => {
@@ -8,5 +8,12 @@ export const getHomeBannerAPI = (distributionSite = 1) => {
         data: {
             distributionSite,
         },
+    })
+}
+// 分类数据
+export const getHomeCategoryAPI = () => {
+    return http<CatrgoryPanelItem[]>({
+        method: 'GET',
+        url: '/home/category/mutli',
     })
 }

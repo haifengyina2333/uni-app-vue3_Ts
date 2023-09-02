@@ -10,6 +10,7 @@ const onChange: UniHelper.SwiperOnChange = (e) => {
 const props = defineProps<{
     list: BannerItem[]
 }>()
+
 onMounted(() => {
     setTimeout(() => {
         console.log('轮播图数据来了', props.list)

@@ -5,3 +5,9 @@ export type BannerItem = {
     hrefUrl: String
     type: Number
 }
+
+export type CatrgoryPanelItem = {
+    icon: String
+    id: Number
+    name: String
+}
