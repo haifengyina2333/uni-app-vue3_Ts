@@ -40,6 +40,8 @@ const onrefresherrefresh = async () => {
     // 开始动画
     isTriggered.value = true
     console.log('下拉刷新触发')
+    // 重置数据
+    guessRef.value.resetPageParams()
 
     await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHostPanelData()])
     isTriggered.value = false

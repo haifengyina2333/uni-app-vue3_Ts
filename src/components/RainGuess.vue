@@ -5,7 +5,7 @@ import { ref, onMounted } from 'vue'
 import { PageParams } from '@/types/global.d'
 // Required 将来后面的 PageParams 改为了必选
 const pageParams: Required<PageParams> = {
-    page: 34,
+    page: 32,
     pageSize: 10,
 }
 const guessList = ref<GuessLike[]>([])
@@ -24,6 +24,11 @@ const getGuessLikeData = async () => {
         finish.value = true
     }
 }
+const resetPageParams = () => {
+    pageParams.page = 32
+    guessList.value = []
+    finish.value = false
+}
 onMounted(() => {
     getGuessLikeData()
     setTimeout(() => console.log('猜你喜欢的数据', guessList), 2000)
@@ -31,6 +36,7 @@ onMounted(() => {
 // 暴露方法,给index调用
 defineExpose({
     getMore: getGuessLikeData,
+    resetPageParams: resetPageParams,
 })
 </script>
 
