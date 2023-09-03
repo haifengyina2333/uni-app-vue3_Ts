@@ -41,7 +41,9 @@
                     </view>
                 </navigator>
             </view>
-            <view class="loading-text">正在加载...</view>
+            <view class="loading-text">{{
+                item.finish ? '没有更多数据了ヾ(≧▽≦*)o' : '正在加载...'
+            }}</view>
         </scroll-view>
     </view>
 </template>
@@ -67,9 +69,15 @@ uni.setNavigationBarTitle({
     title: currUrlMap!.title,
 })
 const bannerPicture = ref('')
-const subTypes = ref<SubTypeItem[]>([])
+const subTypes = ref<SubTypeItem & { finish?: boolean }[]>([])
+
+// 第一次载入数据时得请求
 const getHotData = async () => {
-    const res = await getHomeRecommendAPI(currUrlMap!.url)
+    const res = await getHomeRecommendAPI(currUrlMap!.url, {
+        // 测试时使用 import.meta.env.DEV 开发环境
+        page: import.meta.env.DEV ? 32 : 1,
+        pageSize: 10,
+    })
     bannerPicture.value = res.result.bannerPicture
     subTypes.value = res.result.subTypes
 }
@@ -77,7 +85,17 @@ const activeIndex = ref(0)
 
 const onScrolltolower = async () => {
     const currsubType = subTypes.value[activeIndex.value]
-    currsubType.goodsItems.page++
+    console.log(currsubType)
+
+    if (currsubType.goodsItems.page < currsubType.goodsItems.pages) {
+        currsubType.goodsItems.page++
+    } else {
+        currsubType.finish = true
+        return uni.showToast({
+            title: '数据加载完毕',
+            icon: 'none',
+        })
+    }
     const res = await getHomeRecommendAPI(currUrlMap!.url, {
         subType: currsubType.id,
         page: currsubType.goodsItems.page,
