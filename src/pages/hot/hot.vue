@@ -40,6 +40,9 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { getHomeRecommendAPI } from '@/services/hot'
+import { onLoad } from '@dcloudio/uni-app'
+
 const hotMap = [
     { type: '1', title: '特惠推荐', url: '/hot/preference' },
     { type: '2', title: '爆款推荐', url: '/hot/inVogue' },
@@ -53,10 +56,16 @@ const query = defineProps<{
 
 const currUrlMap = hotMap.find((x) => x.type === query.type)
 uni.setNavigationBarTitle({
-    title: currUrlMap?.title,
+    title: currUrlMap!.title,
 })
+const getHotData = async () => {
+    const res = await getHomeRecommendAPI(currUrlMap!.url)
+    console.log(res)
+}
 // 页面周期函数--监听页面加载
-// onLoad()
+onLoad(() => {
+    getHotData()
+})
 // 页面周期函数--监听页面初次渲染完成
 // onReady()
 // 页面周期函数--监听页面显示(not-nvue)

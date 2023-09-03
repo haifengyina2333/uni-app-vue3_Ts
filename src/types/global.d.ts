@@ -1,16 +1,16 @@
 export type PageRusult<T> = {
     items: T[]
-    counts: Number
+    counts: number
     /** 当前页数 */
-    page: Number
+    page: number
     /** 总页数 */
-    pages: Number
+    pages: number
     /** 每页条数 */
-    pageSize: Number
+    pageSize: number
 }
 export type PageParams = {
     /** 页码：默认值为 1 */
-    page?: Number
+    page?: number
     /** 页大小：默认值为 10 */
-    pageSize?: Number
+    pageSize?: number
 }

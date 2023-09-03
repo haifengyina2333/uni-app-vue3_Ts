@@ -1,37 +1,37 @@
 // 首页轮播图的类型结果
 export type BannerItem = {
-    id: String
-    imgUrl: String
-    hrefUrl: String
-    type: Number
+    id: string
+    imgUrl: string
+    hrefUrl: string
+    type: number
 }
 
 export type CatrgoryPanelItem = {
-    icon: String
-    id: Number
-    name: String
+    icon: string
+    id: number
+    name: string
 }
 
 export type HotPanelItem = {
-    alt: String
-    id: Number
-    pictures: String[]
-    target: Number
-    title: String
-    type: Number
+    alt: string
+    id: number
+    pictures: string[]
+    target: number
+    title: string
+    type: number
 }
 export type GuessLike = {
-    desc: String
+    desc: string
     /** 商品折扣 */
-    discount: Number
+    discount: number
     /** id */
-    id: String
+    id: string
     /** 商品名称 */
-    name: String
+    name: string
     /** 商品已下单数量 */
-    orderNum: Number
+    orderNum: number
     /** 商品图片 */
-    picture: String
+    picture: string
     /** 商品价格 */
-    price: Number
+    price: number
 }
