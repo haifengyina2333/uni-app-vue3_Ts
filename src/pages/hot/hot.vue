@@ -51,7 +51,7 @@ const hotMap = [
 ]
 // uniapp获取页面参数
 const query = defineProps<{
-    type: String
+    type: string
 }>()
 
 const currUrlMap = hotMap.find((x) => x.type === query.type)
