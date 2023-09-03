@@ -6,7 +6,7 @@ import { getHomeBannerAPI } from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
 import { getCategoryTopAPI } from '@/services/category'
 import { CategoryTopItem, CategoryChildItem } from '@/types/category.d'
-
+import Categoryskeleton from './categoryskeleton'
 const bannerList = ref<BannerItem[]>([])
 const getBannerData = async () => {
     const res = await getHomeBannerAPI(2)
@@ -23,14 +23,17 @@ const getCategoryTopData = async () => {
 const subCategoryList = computed(() => {
     return categoryList.value[activeIndex.value]?.children || []
 })
-onLoad(() => {
-    getBannerData()
-    getCategoryTopData()
+const isFinish = ref(false)
+onLoad(async () => {
+    isFinish.value = true
+    await Promise.all([getBannerData(), getCategoryTopData()])
+    isFinish.value = false
 })
 </script>
 
 <template>
-    <view class="viewport">
+    <Categoryskeleton v-if="isFinish"></Categoryskeleton>
+    <view class="viewport" v-else>
         <!-- 搜索框 -->
         <view class="search">
             <view class="input">
