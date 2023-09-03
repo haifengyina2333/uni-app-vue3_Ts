@@ -16,10 +16,19 @@ const getGoodsData = async () => {
 }
 onLoad(() => {
     getGoodsData()
-    setTimeout(() => {
-        console.log(goods.value)
-    }, 2000)
 })
+
+const currentIndex = ref(0)
+const swiperChange: UniHelper.SwiperOnChange = (e) => {
+    currentIndex.value = e.detail!.current
+}
+
+const onTapImage = (url: string) => {
+    uni.previewImage({
+        current: currentIndex.value,
+        urls: goods?.value.mainPictures,
+    })
+}
 </script>
 
 <template>
@@ -28,15 +37,15 @@ onLoad(() => {
         <view class="goods">
             <!-- 商品主图 -->
             <view class="preview">
-                <swiper circular>
+                <swiper circular @change="swiperChange" interval="3000" autoplay>
                     <swiper-item v-for="item in goods?.mainPictures" :key="item">
-                        <image mode="aspectFill" :src="item" />
+                        <image mode="aspectFill" :src="item" @tap="onTapImage" />
                     </swiper-item>
                 </swiper>
                 <view class="indicator">
-                    <text class="current">1</text>
+                    <text class="current">{{ currentIndex + 1 }}</text>
                     <text class="split">/</text>
-                    <text class="total">5</text>
+                    <text class="total">{{ goods.mainPictures.length }}</text>
                 </view>
             </view>
 
