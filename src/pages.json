@@ -49,6 +49,12 @@
 				"navigationBarTitleText": "热门推荐",
 				"onReachBottomDistance": 0
 			}
+		},
+		{
+			"path": "pages/goods/goods",
+			"style": {
+				"navigationBarTitleText": "商品详情"
+			}
 		}
 	],
 	"globalStyle": {
