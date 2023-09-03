@@ -11,17 +11,19 @@
                 :class="{ active: index === activeIndex }"
                 v-for="(item, index) in subTypes"
                 :key="item.id"
-                @tap="activeIndex = activeIndex = index"
+                @tap="activeIndex = index"
                 >{{ item.title }}</text
             >
         </view>
+
         <!-- 推荐列表 -->
         <scroll-view
-            scroll-y
             class="scroll-view"
             v-for="(item, index) in subTypes"
             :key="item.id"
             v-show="activeIndex === index"
+            @scrolltolower="onScrolltolower"
+            scroll-y
         >
             <view class="goods">
                 <navigator
@@ -68,16 +70,28 @@ const bannerPicture = ref('')
 const subTypes = ref<SubTypeItem[]>([])
 const getHotData = async () => {
     const res = await getHomeRecommendAPI(currUrlMap!.url)
-    console.log(res.result)
     bannerPicture.value = res.result.bannerPicture
     subTypes.value = res.result.subTypes
 }
-
 const activeIndex = ref(0)
+
+const onScrolltolower = async () => {
+    const currsubType = subTypes.value[activeIndex.value]
+    currsubType.goodsItems.page++
+    const res = await getHomeRecommendAPI(currUrlMap!.url, {
+        subType: currsubType.id,
+        page: currsubType.goodsItems.page,
+        pageSize: currsubType.goodsItems.pageSize,
+    })
+    const newData = res.result.subTypes[activeIndex.value]
+    currsubType.goodsItems.items.push(...newData.goodsItems.items)
+}
+
 // 页面周期函数--监听页面加载
 onLoad(() => {
     getHotData()
 })
+
 // 页面周期函数--监听页面初次渲染完成
 // onReady()
 // 页面周期函数--监听页面显示(not-nvue)
@@ -96,7 +110,7 @@ onLoad(() => {
 // onShareAppMessage(options) {},
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 page {
     height: 100%;
     background-color: #f4f4f4;
@@ -118,10 +132,6 @@ page {
     position: absolute;
     left: 0;
     top: 0;
-}
-
-.scroll-view {
-    flex: 1;
 }
 
 .tabs {
@@ -157,11 +167,15 @@ page {
     }
 }
 
+.scroll-view {
+    flex: 1;
+}
+
 .goods {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 0 20rpx 20rpx;
+    padding: 0rpx 20rpx 20rpx;
 
     .navigator {
         width: 345rpx;
