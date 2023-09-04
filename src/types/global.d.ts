@@ -29,3 +29,13 @@ export type GoodsItem = {
     /** 商品价格 */
     price: number
 }
+export type BaseProfile = {
+    /** 用户ID */
+    id: number
+    /** 头像  */
+    avatar: string
+    /** 账户名  */
+    account: string
+    /** 昵称 */
+    nickname?: string
+}
