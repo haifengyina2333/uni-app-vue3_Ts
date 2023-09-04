@@ -9,6 +9,8 @@ import CategoryPanel from '@/pages/index/components/CategoryPanel.vue'
 import HotPanel from '@/pages/index/components/HotPanel.vue'
 import { RainGuessInstance } from '@/components/components.d'
 import PageSkeleton from './components/PageSkeleton.vue'
+import useGuessList from '@/hooks/Guess'
+
 const isLoading = ref(false)
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CatrgoryPanelItem[]>([])
@@ -25,11 +27,8 @@ const getHomeHostPanelData = async () => {
     const res = await getHomeHostPanelAPI()
     hotPanelList.value = res.result
 }
-const onscrolltolower = () => {
-    console.log('触发底部')
-    guessRef.value?.getMore()
-}
-const guessRef = ref<RainGuessInstance>()
+const { guessRef, onScrolltolower } = useGuessList()
+
 onLoad(async () => {
     isLoading.value = true
     await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHostPanelData()])
@@ -37,6 +36,7 @@ onLoad(async () => {
 })
 const isTriggered = ref(false)
 
+// 下拉刷新
 const onrefresherrefresh = async () => {
     // 开始动画
     isTriggered.value = true
@@ -54,7 +54,7 @@ const onrefresherrefresh = async () => {
     <scroll-view
         scroll-y
         class="scroll-view"
-        @scrolltolower="onscrolltolower"
+        @scrolltolower="onScrolltolower"
         refresher-enabled
         @refresherrefresh="onrefresherrefresh"
         :refresher-triggered="isTriggered"
