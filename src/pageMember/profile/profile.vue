@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserInfoAPI } from '@/services/profile.ts'
-import { ProfileDetail } from '@/types/profile.d'
+import { getUserInfoAPI, putUserInfoAPI } from '@/services/profile.ts'
+import { ProfileDetail, Gender } from '@/types/profile.d'
 import { onLoad } from '@dcloudio/uni-app'
+import { useMemberStore } from '@/stores/modules/member'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
-const profile = ref<ProfileDetail>()
+// 防止 v-model的问题
+const MemberStore = useMemberStore()
+const profile = ref<ProfileDetail>({} as ProfileDetail)
 const getProFileData = async () => {
     const res = await getUserInfoAPI()
     console.log(res)
@@ -15,6 +18,76 @@ const getProFileData = async () => {
 onLoad(() => {
     getProFileData()
 })
+// 修改头像功能
+const onAvatarChange = () => {
+    // 拍照api
+    uni.chooseMedia({
+        count: 1,
+        mediaType: ['image'],
+        success: (res) => {
+            const { tempFilePath } = res.tempFiles[0]
+            uni.uploadFile({
+                url: '/member/profile/avatar',
+                name: 'file',
+                filePath: tempFilePath,
+                success: (success) => {
+                    if (success.statusCode !== 200)
+                        return uni.showToast({
+                            title: '服务器错误',
+                            icon: 'error',
+                        })
+                    const data = JSON.parse(success.data).result.avatar
+                    profile.value!.avatar = data
+                    MemberStore.profile.avatar = data
+                    uni.showToast({
+                        title: '更新成功',
+                        icon: 'success',
+                    })
+                },
+            })
+        },
+    })
+}
+const onSubmit = async () => {
+    const { nickname, gender, birthday, profession } = profile.value
+    console.log(profession)
+
+    const res = await putUserInfoAPI({
+        nickname,
+        gender,
+        birthday,
+        profession,
+        provinceCode: fullLocationCode[0],
+        cityCode: fullLocationCode[1],
+        countyCode: fullLocationCode[2],
+    })
+
+    MemberStore.profile.nickname = res.result.nickname
+    MemberStore.profile.gender = res.result.gender
+    setTimeout(() => {
+        uni.navigateBack()
+    }, 500)
+    uni.showToast({
+        title: '保存成功！',
+        icon: 'success',
+        mask: true,
+    })
+}
+const onGenderChange = (e) => {
+    console.log(e)
+    profile.value.gender = e.detail.value
+}
+// 修改生日
+const onDateChange = (e) => {
+    profile.value.birthday = e.detail.value
+    console.log(e.detail)
+}
+let fullLocationCode: [string, string, string] = ['', '', '']
+const onfullLocationchange = (e) => {
+    console.log(e.detail)
+    profile.value.fullLocation = e.detail.value.join(' ')
+    fullLocationCode = e.detail.code
+}
 </script>
 
 <template>
@@ -30,7 +103,7 @@ onLoad(() => {
         </view>
         <!-- 头像 -->
         <view class="avatar">
-            <view class="avatar-content">
+            <view class="avatar-content" @tap="onAvatarChange">
                 <image class="image" :src="profile?.avatar" mode="aspectFill" />
                 <text class="text">点击修改头像</text>
             </view>
@@ -41,7 +114,7 @@ onLoad(() => {
             <view class="form-content">
                 <view class="form-item">
                     <text class="label">账号</text>
-                    <text class="account">账号名</text>
+                    <text class="account">{{ profile.account }}</text>
                 </view>
                 <view class="form-item">
                     <text class="label">昵称</text>
@@ -49,12 +122,12 @@ onLoad(() => {
                         class="input"
                         type="text"
                         placeholder="请填写昵称"
-                        :value="profile?.nickname"
+                        v-model="profile!.nickname"
                     />
                 </view>
                 <view class="form-item">
                     <text class="label">性别</text>
-                    <radio-group>
+                    <radio-group @change="onGenderChange">
                         <label class="radio">
                             <radio value="男" color="#27ba9b" :checked="profile?.gender === '男'" />
                             男
@@ -73,6 +146,7 @@ onLoad(() => {
                         start="1900-01-01"
                         :end="new Date()"
                         :value="profile?.birthday"
+                        @change="onDateChange"
                     >
                         <view v-if="profile?.birthday">{{ profile?.birthday }}</view>
                         <view class="placeholder" v-else>请选择日期</view>
@@ -80,8 +154,13 @@ onLoad(() => {
                 </view>
                 <view class="form-item">
                     <text class="label">城市</text>
-                    <picker class="picker" mode="region" :value="profile?.fullLocation.split(' ')">
-                        <view v-if="false">{{ profile?.fullLocation }}</view>
+                    <picker
+                        @change="onfullLocationchange"
+                        class="picker"
+                        mode="region"
+                        :value="profile?.fullLocation.split(' ')"
+                    >
+                        <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
                         <view class="placeholder" v-else>请选择城市</view>
                     </picker>
                 </view>
@@ -91,12 +170,12 @@ onLoad(() => {
                         class="input"
                         type="text"
                         placeholder="请填写职业"
-                        :value="profile.profession"
+                        v-model="profile.profession"
                     />
                 </view>
             </view>
             <!-- 提交按钮 -->
-            <button class="form-button">保 存</button>
+            <button class="form-button" @tap="onSubmit">保 存</button>
         </view>
     </view>
 </template>
