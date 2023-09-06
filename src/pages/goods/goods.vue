@@ -5,6 +5,7 @@ import { getGoodsByIdAPI } from '@/services/goods'
 import { GoodsResult } from '@/types/goods.d'
 import AddressPanel from './components/addressPanel'
 import ServicePanel from './components/servicePanel'
+import { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
@@ -15,6 +16,28 @@ const goods = ref<GoodsResult>()
 const getGoodsData = async () => {
     const res = await getGoodsByIdAPI(props.id)
     goods.value = res.result
+    localdata.value = {
+        _id: res.result.id,
+        name: res.result.name,
+        goods_thumb: res.result.mainPictures[0],
+        spec_list: res.result.specs.map((v) => {
+            return {
+                name: v.name,
+                list: v.values,
+            }
+        }),
+        sku_list: res.result.skus.map((v) => {
+            return {
+                _id: v.id,
+                goods_id: res.result.id,
+                goods_name: res.result.name,
+                image: v.picture,
+                price: v.price * 100,
+                stock: v.inventory,
+                sku_name_arr: v.specs.map((w) => w.valueName),
+            }
+        }),
+    }
 }
 onLoad(() => {
     getGoodsData()
@@ -43,9 +66,25 @@ const openPopup = (name: typeof popupName.value) => {
     popupName.value = name
     popup.value.open()
 }
+
+// sku相关功能
+const isShowSku = ref(false)
+const localdata = ref({} as SkuPopupLocaldata)
 </script>
 
 <template>
+    <!-- 弹窗 -->
+    <vk-data-goods-sku-popup
+        ref="skuPopup"
+        v-model="isShowSku"
+        border-radius="20"
+        :localdata="localdata"
+        :mode="skuMode"
+        @open="onOpenSkuPopup"
+        @close="SkuPopup"
+        @add-cart="addCart"
+        @buy-now="buyNow"
+    ></vk-data-goods-sku-popup>
     <scroll-view scroll-y class="viewport">
         <!-- 基本信息 -->
         <view class="goods">
@@ -75,7 +114,7 @@ const openPopup = (name: typeof popupName.value) => {
 
             <!-- 操作面板 -->
             <view class="action">
-                <view class="item arrow">
+                <view class="item arrow" @tap="isShowSku = true">
                     <text class="label">选择</text>
                     <text class="text ellipsis"> 请选择商品规格 </text>
                 </view>
