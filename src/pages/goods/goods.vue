@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getGoodsByIdAPI } from '@/services/goods'
 import { GoodsResult } from '@/types/goods.d'
 import AddressPanel from './components/addressPanel'
 import ServicePanel from './components/servicePanel'
-import { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import {
+    SkuPopupLocaldata,
+    SkuPopupInstance,
+    SkuPopupEvent,
+} from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import { postAddCartAPI } from '@/services/cart'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
@@ -16,6 +21,7 @@ const goods = ref<GoodsResult>()
 const getGoodsData = async () => {
     const res = await getGoodsByIdAPI(props.id)
     goods.value = res.result
+    console.log(res.result)
     localdata.value = {
         _id: res.result.id,
         name: res.result.name,
@@ -80,6 +86,21 @@ const openSkuPopup = (val: SkuMode) => {
     skuMode.value = val
     isShowSku.value = true
 }
+const skuPopup = ref<SkuPopupInstance>()
+const selectArrtext = computed(() => {
+    return skuPopup.value?.selectArr?.join(' ').trim() || '请选择商品信息'
+})
+const onAddCart = async (e: SkuPopupEvent) => {
+    await postAddCartAPI({
+        skuId: e._id,
+        count: e.buy_num,
+    })
+    uni.showToast({
+        icon: 'none',
+        title: '添加成功',
+    })
+    isShowSku.value = false
+}
 </script>
 
 <template>
@@ -90,12 +111,14 @@ const openSkuPopup = (val: SkuMode) => {
         border-radius="20"
         :localdata="localdata"
         :mode="skuMode"
-        @open="onOpenSkuPopup"
-        @close="SkuPopup"
-        @add-cart="addCart"
-        @buy-now="buyNow"
         add-cart-background-color="#FFA868"
         buy-now-background-color="#27BA9B"
+        :actived-style="{
+            color: '#27BA9B',
+            borderColor: '#27BA9B',
+            backgroundColor: '#E9F8F5',
+        }"
+        @add-cart="onAddCart"
     ></vk-data-goods-sku-popup>
     <scroll-view scroll-y class="viewport">
         <!-- 基本信息 -->
@@ -128,7 +151,7 @@ const openSkuPopup = (val: SkuMode) => {
             <view class="action">
                 <view class="item arrow" @tap="openSkuPopup(SkuMode.All)">
                     <text class="label">选择</text>
-                    <text class="text ellipsis"> 请选择商品规格 </text>
+                    <text class="text ellipsis"> {{ selectArrtext }} </text>
                 </view>
                 <view class="item arrow" @tap="openPopup('address')">
                     <text class="label">送至</text>
